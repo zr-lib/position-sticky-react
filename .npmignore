@@ -1,6 +1,15 @@
 # .npmignore 
+
+node_modules/*
+
 demo
+
 .babelrc
+
 .gitignore
+
 config/*
+
+src/*
+
 tsconfig.json
