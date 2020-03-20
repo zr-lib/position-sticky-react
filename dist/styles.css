@@ -1,0 +1,24 @@
+/*!
+ * position-sticky
+ * version: 0.0.3
+ * build: 2020-03-20 17:44:47
+ */
+.position-sticky-wrapper {
+  position: relative;
+}
+
+.position-sticky {
+  width: 100%;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  transition: none !important;
+  z-index: 10;
+}
+
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+

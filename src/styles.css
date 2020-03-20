@@ -1,0 +1,17 @@
+.position-sticky-wrapper {
+  position: relative;
+}
+
+.position-sticky {
+  width: 100%;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  transition: none !important;
+  z-index: 10;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+}

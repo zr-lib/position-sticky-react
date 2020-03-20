@@ -1,0 +1,6 @@
+# .npmignore 
+demo
+.babelrc
+.gitignore
+config/*
+tsconfig.json
