@@ -1,0 +1,28 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.container {
+  height: 300px;
+  overflow: auto;
+}
+
+.item > .title {
+  width: 100%;
+  background: cyan;
+}
+
+.item > .content {
+  padding: 100px 0;
+  background: lightsalmon;
+}
+
+.block {
+  padding: 300px 0;
+  background: lightblue;
+}
+.half {
+  padding: 150px 0;
+  background: lightblue;
+}

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    // "outDir": "./dist",
     "declaration": true,
+    "declarationDir": "./dist",
     "baseUrl": ".",
-    "module": "commonjs",
-    "target": "ES5",
+    "target": "esnext",
     "lib": ["es6", "dom", "es2017"],
-    "sourceMap": true,
+    "sourceMap": false,
     "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",

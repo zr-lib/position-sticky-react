@@ -1,15 +1,17 @@
 # .npmignore 
 
-node_modules/*
-
-demo
-
 .babelrc
 
 .gitignore
 
+tsconfig.json
+
+node_modules/*
+
 config/*
 
-src/*
+build/* 
 
-tsconfig.json
+example/*
+
+src/*

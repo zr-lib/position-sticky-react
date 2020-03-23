@@ -1,17 +1,11 @@
-import React, { HTMLAttributes } from 'react';
+import React, { HTMLAttributes, useEffect, useRef } from 'react';
 import './styles.css';
 
-export interface PositionStickyClass extends HTMLAttributes<HTMLElement> {
+export interface PositionStickyFunc extends HTMLAttributes<HTMLElement> {
   scrollContainer?: string;
   wrapperSelector: string;
   stickySelector: string;
   hideBottom?: number;
-}
-
-export interface PositionStickyState {
-  scrollContainerEl: HTMLElement | null;
-  wrapperEl: React.RefObject<HTMLDivElement> | null;
-  stickyEl: HTMLElement | null;
 }
 
 /**
@@ -23,82 +17,79 @@ export interface PositionStickyState {
  * @param stickySelector {*} 需要 sticky 的元素的 CSS 选择器；例：".title"
  * @param hideBottom {*} 距离底部的距离去除 sticky，默认 wrapperSelector 不在视野内去除
  */
-class PositionSticky extends React.Component<
-  PositionStickyClass,
-  PositionStickyState
-> {
-  readonly state: PositionStickyState = {
-    scrollContainerEl: null,
-    wrapperEl: React.createRef<HTMLDivElement>(),
-    stickyEl: null
-  };
+function PositionSticky({
+  scrollContainer,
+  wrapperSelector,
+  stickySelector,
+  hideBottom,
+  className,
+  children,
+  ...props
+}: PositionStickyFunc) {
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLElement | null>(null);
 
-  constructor(props: PositionStickyClass) {
-    super(props);
+  useEffect(() => {
+    if (!wrapperSelector || !stickySelector) return;
 
-    this.onWindowScroll = this.onWindowScroll.bind(this);
-    this.onContainerScroll = this.onContainerScroll.bind(this);
-  }
-
-  public componentDidMount() {
-    const { wrapperSelector, stickySelector } = this.props;
     const stickyEl = document.querySelector(
       `${wrapperSelector} ${stickySelector}`
     ) as HTMLElement;
 
     if (stickyEl) {
-      if (CSS.supports('position: sticky')) {
-        stickyEl.style.position = 'sticky';
+      if (window.CSS?.supports('position: sticky')) {
+        stickyEl.classList.add('sticky');
       } else {
-        this.setState({ stickyEl });
-        this.bindScroll();
+        stickyRef.current = stickyEl;
+        bindScroll();
       }
     } else {
       console.warn(
         `请检查 ${wrapperSelector} ${stickySelector} 是否是有效元素！`
       );
     }
-  }
 
-  public componentWillUnmount() {
-    if (this.state.scrollContainerEl) {
-      this.state.scrollContainerEl?.removeEventListener(
-        'scroll',
-        this.onContainerScroll,
-        false
-      );
-    } else {
-      window.removeEventListener('scroll', this.onWindowScroll, false);
-    }
-  }
+    return () => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.removeEventListener(
+          'scroll',
+          onContainerScroll,
+          false
+        );
+      } else {
+        window.removeEventListener('scroll', onWindowScroll, false);
+      }
+    };
+  }, []);
 
-  public bindScroll = () => {
-    const { scrollContainer } = this.props;
+  const bindScroll = () => {
     const container = document.querySelector(
       `${scrollContainer}`
     ) as HTMLElement;
     if (scrollContainer && container) {
-      this.setState({ scrollContainerEl: container });
-      container.addEventListener('scroll', this.onContainerScroll, false);
+      scrollContainerRef.current = container;
+      scrollContainerRef.current.addEventListener(
+        'scroll',
+        onContainerScroll,
+        false
+      );
     } else {
       console.warn(`请检查 ${scrollContainer} 是否是有效元素！`);
     }
     if (scrollContainer === undefined) {
-      window.addEventListener('scroll', this.onWindowScroll, false);
+      window.addEventListener('scroll', onWindowScroll, false);
     }
   };
 
-  public onContainerScroll = (e: any) => {
-    const { hideBottom } = this.props;
-    const { wrapperEl, stickyEl } = this.state;
-
+  const onContainerScroll = (e: any) => {
     const scrollTop = e.target.scrollTop!;
-    const parentNode = wrapperEl!.current!.parentElement;
-    const { offsetTop, offsetHeight } = wrapperEl!.current!;
+    const parentNode = wrapperRef.current!.parentElement;
+    const { offsetTop, offsetHeight } = wrapperRef.current!;
     // top: 元素顶部距离“父元素”顶部的距离，bottom: 元素底部距离“父元素”顶部的距离
     const top = offsetTop - parentNode!.offsetTop;
     const bottom = top + offsetHeight;
-    const stickyElHeight = stickyEl!.clientHeight;
+    const stickyElHeight = stickyRef.current!.clientHeight;
     const hideBottomDistance =
       hideBottom !== undefined ? hideBottom : stickyElHeight;
 
@@ -108,58 +99,53 @@ class PositionSticky extends React.Component<
 
     if (scrollTop > top && scrollTop < bottom) {
       // console.log(`固定 ${wrapperSelector} ${stickySelector}`);
-      stickyEl!.style.top = `${scrollTop - top}px`;
-      if (!stickyEl!.classList.contains('position-sticky')) {
-        wrapperEl!.current!.style.paddingTop = `${stickyElHeight}px`;
-        stickyEl!.classList.add('position-sticky');
+      stickyRef.current!.style.top = `${scrollTop - top}px`;
+      if (!stickyRef.current!.classList.contains('position-sticky')) {
+        wrapperRef.current!.style.paddingTop = `${stickyElHeight}px`;
+        stickyRef.current!.classList.add('position-sticky');
       }
     }
 
     if (scrollTop <= top || scrollTop > bottom - hideBottomDistance) {
       // console.log(`不固定 ${wrapperSelector} ${stickySelector}`);
-      if (stickyEl!.classList.contains('position-sticky')) {
-        stickyEl!.classList.remove('position-sticky');
-        stickyEl!.style.top = `${0}px`;
-        wrapperEl!.current!.style.paddingTop = `${0}px`;
+      if (stickyRef.current!.classList.contains('position-sticky')) {
+        stickyRef.current!.classList.remove('position-sticky');
+        stickyRef.current!.style.top = `${0}px`;
+        wrapperRef.current!.style.paddingTop = `${0}px`;
       }
     }
   };
 
-  private onWindowScroll = () => {
+  const onWindowScroll = () => {
     // top: 元素顶部距离html顶部的距离，bottom: 元素底部距离html顶部的距离
-    const { wrapperEl, stickyEl } = this.state;
-    const { top, bottom } = wrapperEl!.current!.getBoundingClientRect();
-    const stickyElHeight = stickyEl!.clientHeight;
-
+    const { top, bottom } = wrapperRef.current!.getBoundingClientRect();
+    const stickyElHeight = stickyRef.current!.clientHeight;
     if (top <= 0 && bottom >= 0) {
       // console.log(`固定 ${wrapperSelector} ${stickySelector}`);
-      wrapperEl!.current!.style.paddingTop = `${stickyElHeight}px`;
-      stickyEl!.classList.add('position-sticky');
-      stickyEl!.style.top = `${-top}px`;
+      wrapperRef.current!.style.paddingTop = `${stickyElHeight}px`;
+      stickyRef.current!.classList.add('position-sticky');
+      stickyRef.current!.style.top = `${-top}px`;
     }
 
     if (bottom < stickyElHeight || top > 0) {
       // console.log(`不固定 ${wrapperSelector} ${stickySelector}`);
-      if (stickyEl!.classList.contains('position-sticky')) {
-        stickyEl!.classList.remove('position-sticky');
-        stickyEl!.style.top = `${0}px`;
-        wrapperEl!.current!.style.paddingTop = `${0}px`;
+      if (stickyRef.current!.classList.contains('position-sticky')) {
+        stickyRef.current!.classList.remove('position-sticky');
+        stickyRef.current!.style.top = `${0}px`;
+        wrapperRef.current!.style.paddingTop = `${0}px`;
       }
     }
   };
 
-  public render() {
-    const { className, children, ...props } = this.props;
-    return (
-      <div
-        ref={this.state.wrapperEl}
-        className={`position-sticky-wrapper ${className || ''}`}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
+  return (
+    <div
+      ref={wrapperRef}
+      className={`position-sticky-wrapper ${className || ''}`}
+      {...props}
+    >
+      {children}
+    </div>
+  );
 }
 
 export default PositionSticky;

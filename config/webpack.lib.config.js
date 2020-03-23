@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const BannerPlugin = require('webpack').BannerPlugin;
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -29,8 +28,6 @@ module.exports = {
   entry: paths.entry,
   output: {
     filename: 'index.js',
-    chunkFilename: '[name].js',
-    // globalObject: 'this',
     library: 'PositionSticky',
     libraryTarget: 'commonjs2',
     path: paths.outputPath,
@@ -45,9 +42,6 @@ module.exports = {
       root: 'React'
     }
   },
-  optimization: {
-    minimize: false
-  },
   module: {
     rules: [
       {
@@ -59,7 +53,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          'style-loader',
           { loader: 'css-loader', options: { importLoaders: 1 } },
           {
             loader: 'postcss-loader',
@@ -84,9 +78,6 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new BannerPlugin(banner),
-    new ForkTsCheckerWebpackPlugin(),
-    new MiniCssExtractPlugin({
-      filename: 'styles.css'
-    })
+    new ForkTsCheckerWebpackPlugin()
   ]
 };

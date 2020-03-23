@@ -1,15 +1,10 @@
-import React, { HTMLAttributes } from 'react';
+import { HTMLAttributes } from 'react';
 import './styles.css';
-export interface PositionStickyClass extends HTMLAttributes<HTMLElement> {
+export interface PositionStickyFunc extends HTMLAttributes<HTMLElement> {
     scrollContainer?: string;
     wrapperSelector: string;
     stickySelector: string;
     hideBottom?: number;
-}
-export interface PositionStickyState {
-    scrollContainerEl: HTMLElement | null;
-    wrapperEl: React.RefObject<HTMLDivElement> | null;
-    stickyEl: HTMLElement | null;
 }
 /**
  * 模拟 position: sticky;
@@ -20,14 +15,5 @@ export interface PositionStickyState {
  * @param stickySelector {*} 需要 sticky 的元素的 CSS 选择器；例：".title"
  * @param hideBottom {*} 距离底部的距离去除 sticky，默认 wrapperSelector 不在视野内去除
  */
-declare class PositionSticky extends React.Component<PositionStickyClass, PositionStickyState> {
-    readonly state: PositionStickyState;
-    constructor(props: PositionStickyClass);
-    componentDidMount(): void;
-    componentWillUnmount(): void;
-    bindScroll: () => void;
-    onContainerScroll: (e: any) => void;
-    private onWindowScroll;
-    render(): JSX.Element;
-}
+declare function PositionSticky({ scrollContainer, wrapperSelector, stickySelector, hideBottom, className, children, ...props }: PositionStickyFunc): JSX.Element;
 export default PositionSticky;
