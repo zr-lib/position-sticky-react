@@ -1,5 +1,10 @@
 # 模拟 position: sticky;
 
+## 下载
+```
+npm i position-sticky-react
+```
+
 ## 兼容
 如果浏览器支持 position: sticky; 则直接使用
 
